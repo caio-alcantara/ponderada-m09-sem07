@@ -3,6 +3,11 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      RABBITMQ_QUEUE: sensor_data_queue
+    depends_on:
+      - rabbitmq
     ports:
       - "8080:8080"
     restart: unless-stopped
