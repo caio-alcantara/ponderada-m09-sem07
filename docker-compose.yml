@@ -12,6 +12,21 @@ services:
       - "8080:8080"
     restart: unless-stopped
 
+  middleware:
+    build:
+      context: ./middleware
+      dockerfile: Dockerfile
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      RABBITMQ_QUEUE: sensor_data_queue
+      POSTGRES_DSN: host=postgres port=5432 user=postgres password=postgres dbname=sensores sslmode=disable
+      BATCH_SIZE: "5000"
+      BATCH_FLUSH_INTERVAL: "2s"
+    depends_on:
+      - rabbitmq
+      - postgres
+    restart: unless-stopped
+
   postgres:
     image: postgres:16-alpine
     environment:
@@ -19,7 +34,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5431:5431"
+      - "5431:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
