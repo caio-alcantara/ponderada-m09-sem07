@@ -4,12 +4,15 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     environment:
-      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      RABBITMQ_URL: amqp://app:app123@rabbitmq:5672/
       RABBITMQ_QUEUE: sensor_data_queue
+      PUBLISH_WORKERS: "8"
+      PUBLISH_BUFFER: "20000"
     depends_on:
       - rabbitmq
     ports:
       - "8080:8080"
+    mem_limit: 2g
     restart: unless-stopped
 
   middleware:
@@ -17,7 +20,7 @@ services:
       context: ./middleware
       dockerfile: Dockerfile
     environment:
-      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      RABBITMQ_URL: amqp://app:app123@rabbitmq:5672/
       RABBITMQ_QUEUE: sensor_data_queue
       POSTGRES_DSN: host=postgres port=5432 user=postgres password=postgres dbname=sensores sslmode=disable
       BATCH_SIZE: "5000"
@@ -25,6 +28,7 @@ services:
     depends_on:
       - rabbitmq
       - postgres
+    mem_limit: 2g
     restart: unless-stopped
 
   postgres:
@@ -38,20 +42,22 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    mem_limit: 2g
     restart: unless-stopped
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
     hostname: rabbitmq
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_USER: app
+      RABBITMQ_DEFAULT_PASS: app123
     ports:
       - "5672:5672"
       - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
       - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+    mem_limit: 2g
     restart: unless-stopped
 
 volumes:
