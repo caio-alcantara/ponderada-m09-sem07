@@ -34,7 +34,7 @@ var publisher *Publisher
 func rabbitMQURL() string {
     value := os.Getenv("RABBITMQ_URL")
     if value == "" {
-        return "amqp://guest:guest@localhost:5672/"
+        return "amqp://app:app123@localhost:5672/"
     }
     return value
 }

@@ -2,30 +2,38 @@ import http from 'k6/http';
 import { check } from 'k6';
 
 const baseUrl = __ENV.BASE_URL || 'http://localhost:8080';
-const stageDuration = __ENV.STAGE_DURATION || '20s';
+const stageDuration = __ENV.STAGE_DURATION || '10s';
 
 export const options = {
   scenarios: {
-    sensor_data_ramp: {
+    sensor_data_ramp_10k: {
       executor: 'ramping-arrival-rate',
       startRate: 10,
       timeUnit: '1s',
       preAllocatedVUs: 500,
-      maxVUs: 120000,
+      maxVUs: 15000,
       stages: [
         { target: 1000, duration: stageDuration },
+        { target: 2000, duration: stageDuration },
+        { target: 3000, duration: stageDuration },
+        { target: 4000, duration: stageDuration },
         { target: 5000, duration: stageDuration },
+        { target: 6000, duration: stageDuration },
+        { target: 7000, duration: stageDuration },
+        { target: 8000, duration: stageDuration },
+        { target: 9000, duration: stageDuration },
         { target: 10000, duration: stageDuration },
-        { target: 25000, duration: stageDuration },
-        { target: 50000, duration: stageDuration },
-        { target: 75000, duration: stageDuration },
-        { target: 100000, duration: stageDuration },
+        { target: 12000, duration: stageDuration },
+        { target: 14000, duration: stageDuration },
+        { target: 16000, duration: stageDuration },
+        { target: 18000, duration: stageDuration },
+        { target: 20000, duration: stageDuration },
       ],
       gracefulStop: '10s',
     },
   },
   thresholds: {
-    http_req_failed: ['rate<0.05'],
+    http_req_failed: ['rate<0.05'], // Limite de 5% para falhas de requisição
   },
 };
 
